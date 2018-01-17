@@ -19,6 +19,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class Login extends JFrame {
 
@@ -68,42 +70,55 @@ public class Login extends JFrame {
 		contentPane.add(lblPassword);
 		
 		passwordField = new JPasswordField();
+		passwordField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				if(arg0.getKeyCode() == 10){
+					login();
+				}
+			}
+		});
 		passwordField.setBounds(249, 77, 86, 20);
 		contentPane.add(passwordField);
 		
 		JButton btnLogin = new JButton("Login");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				PreparedStatement ps;
-				String sql="SELECT * FROM user WHERE username=? AND password=MD5(?) AND type='pegawai'";
-				try{
-					ResultSet rs;
-					ps=con.prepareStatement(sql);
-					ps.setString(1, textIDPegawai.getText());
-					ps.setString(2, String.valueOf(passwordField.getPassword()));
-					rs=ps.executeQuery();
-					if(rs.next()
-							){
-						Admin_menu frMenu=new Admin_menu();
-						frMenu.setVisible(true);
-						frMenu.setAdmin(textIDPegawai.getText());
-						setVisible(false);
-						
-					
-					}
-					else{
-						JOptionPane.showMessageDialog(null, "Login Gagal");
-					}
-					
-					
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
-				
+				login();
 			}
 		});
 		btnLogin.setBounds(176, 144, 89, 23);
 		contentPane.add(btnLogin);
+	}
+	
+	private void login(){
+		PreparedStatement ps;
+		String sql="SELECT * FROM user WHERE username=? AND password=MD5(?) AND type='pegawai'";
+		try{
+			ResultSet rs;
+			ps=con.prepareStatement(sql);
+			ps.setString(1, textIDPegawai.getText());
+			ps.setString(2, String.valueOf(passwordField.getPassword()));
+			rs=ps.executeQuery();
+			if(rs.next()
+					){
+				TanganiAntrian frMenu=new TanganiAntrian();
+				TambahAntrian tam=new TambahAntrian();
+			
+				tam.setPegawai(textIDPegawai.getText());
+				frMenu.setVisible(true);
+				frMenu.setNama(textIDPegawai.getText());
+
+				setVisible(false);
+			}
+			else{
+				JOptionPane.showMessageDialog(null, "Login Gagal");
+			}
+						
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 }
